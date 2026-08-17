@@ -1,0 +1,23 @@
+{
+    "compilerOptions": {
+        "rootDir": "./src",
+        "outDir": "./built",
+
+        "allowJs": true,
+        "strict": true,
+        
+        "types":["chrome-types"],
+
+        "target": "es2025",
+        "module": "esnext",
+        "moduleResolution": "bundler",
+    },
+    "include": [
+        "./src/**/*"
+    ],
+    "typeAcquisition": {
+        "include": [
+            "chrome"
+        ]
+    }
+}

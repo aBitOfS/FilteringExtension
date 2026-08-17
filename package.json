@@ -1,0 +1,9 @@
+{
+  "devDependencies": {
+    "typescript": "^7.0.2"
+  },
+  "dependencies": {
+    "chrome-types": "^0.1.439",
+    "vite": "^8.2.1"
+  }
+}

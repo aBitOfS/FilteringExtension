@@ -1,0 +1,22 @@
+/* Manual Select */
+    .filtering-extension-selected {
+        border: 3px solid blue !important;
+        border-radius: 3px;
+    }
+    .filtering-extension-selected > * /*:first-child*/ {
+        border: 3px solid red !important;
+        border-radius: 3px;
+    }
+    /* ControlsElement */
+    #filtering-extension-content {
+        text-align: center;
+        position: fixed;
+        /* inset: 10px auto 30px; */
+        top: 30px;
+        left: 30px;
+        right: 30px;
+        padding: 3px;
+        z-index: 100;
+        /* width: 30%; */
+        background-color: green;
+    }
