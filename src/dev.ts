@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.getElementById("popup")!.innerHTML = await popupFile.text();
 
         await import("./popup");
+        
     };
     mountComponentsForTesting();
 });
