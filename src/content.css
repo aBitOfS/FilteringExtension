@@ -1,11 +1,14 @@
 /* Manual Select */
-    .filtering-extension-selected {
+    .fil-ext-m-item {
+        border: 3px solid red !important;
+        border-radius: 3px;
+    }
+    .fil-ext-m-parent {
         border: 3px solid blue !important;
         border-radius: 3px;
     }
-    .filtering-extension-selected > * /*:first-child*/ {
-        border: 3px solid red !important;
-        border-radius: 3px;
+    .fil-ext-m-id {
+        background-color: green !important;
     }
     /* ControlsElement */
     #filtering-extension-content {
@@ -19,4 +22,16 @@
         z-index: 100;
         /* width: 30%; */
         background-color: green;
+    }
+/* Working */
+    #fil-ext-list > * {
+        position: relative;
+        border: 2px solid grey;
+        border-radius: 10px;
+        margin-bottom: 10px;
+    }
+    .fil-ext-item-controls {
+        position: absolute;
+        bottom: 7px;
+        left: 7px;
     }

@@ -1,4 +1,5 @@
 /.package-lock.json.old
 /node_modules
 /opencode.json
-/dev/Klawiatury - Technologia po prostu w x-kom_files
+/src/dev/Klawiatury - Technologia po prostu w x-kom_files
+/preact

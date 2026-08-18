@@ -1,62 +1,116 @@
 import { AppStateBehavior } from "./content";
 import { create } from "./createElementShortcuts";
-import { setAppState } from "./dev_utils";
+import { findCommonParent, setAppState, setConfig } from "./dev_utils";
 
 let selectedElements: HTMLElement[] = []
-let commonParent: HTMLElement | null = null;
+// let commonParent: HTMLElement | null = null;
+let selector = "";
+let idSelector = "";
+
+const [addClassWithUndo, undoClassAdd] = (() => {
+    let toUndo: [Element,string][] = [];
+    return [(element: Element | null, className: string) => {
+        if (!element) return;
+        element.classList.add(className);
+        toUndo.push([element,className]);
+    }, () => {
+        toUndo.forEach((value) => value[0].classList.remove(value[1]));
+        toUndo = [];
+    }]
+})()
 
 function selectItem(event: MouseEvent) {
     if (contentElement.contains(event.target as HTMLElement)) return
     event.stopImmediatePropagation();
+    event.preventDefault();
+    event.stopPropagation();
 
     selectedElements.push(event.target as HTMLElement);
+    undoClassAdd();
 
-    if (commonParent) commonParent.classList.remove("filtering-extension-selected");
+    if (selectedElements.length < 2) return;
 
-    commonParent = findCommonParent(selectedElements);
-    commonParent?.classList.add("filtering-extension-selected");
+    let listItem = getItemFromItsChild(selectedElements[0],selectedElements[1]);
+    selector = getQuerySelector(listItem) ?? "";
+
+    // Add Handle different selectors (like recommended products)
+
+    if (selector != "") {
+        idSelector = getQuerySelector(selectedElements[0],listItem) ?? "";
+        document.querySelectorAll(selector).forEach((el) => {
+            addClassWithUndo(el,"fil-ext-m-item");
+            addClassWithUndo(el.querySelector(idSelector),"fil-ext-m-id");
+        });
+        addClassWithUndo(findCommonParent(selectedElements),"fil-ext-m-parent");
+    }
     
     updateAppearance();
 }
 
-function findCommonParent(elements: HTMLElement[]): HTMLElement | null {
-    if (elements.length <= 1) return null;
-    let parent: HTMLElement | null = elements[0]
-    for (let i = 1; i < elements.length; i++) {
-        while (parent && !parent.contains(elements[i])) {
-            parent = parent.parentElement;
-        }
-    }
-    return parent;
-}
-
 function getItemFromItsChild(itemChild: HTMLElement, siblingChild: HTMLElement): HTMLElement {
-    while (itemChild.parentElement && !itemChild.parentElement.contains(siblingChild)) {
+    // let c = 0
+    // console.log(itemChild);
+    while (itemChild != document.body && itemChild.parentElement && !itemChild.parentElement.contains(siblingChild)) {
+        // console.log(itemChild, itemChild.parentElement, c);
         itemChild = itemChild.parentElement;
+        // c++;
+        // if (c > 100) throw new Error("Infinite look in getItemFromItsChild");
     }
     return itemChild;
 }
-function getListItemSelector(listItems: HTMLElement[]): string | null {
-    if (listItems.length <= 1) return null;
+
+function getQuerySelector(listItem: HTMLElement | null, relativeTo: HTMLElement = document.body): string | null {
+    let selector = "";
     
-    let listItem = getItemFromItsChild(listItems[0],listItems[1]);
-    
-    
+    // let c = 0
+    while (listItem && listItem != relativeTo) {
+        if (listItem.id) {
+            selector = `#${listItem.id} > ${selector}`;
+            break;
+        }
+        selector = ` > ${selector}`;
+        // listItem.classList.forEach((value: string) => {
+        //     selector = `.${value}${selector}`;
+        // })
+        selector = `${listItem.nodeName.toLowerCase()}${selector}`;
+        listItem = listItem.parentElement;
+        // console.log(selector);
+        // c++;
+        // if (c > 1000) throw new Error("Infinite look in getQuerySelector");
+    }
+    if (listItem == document.body) selector = `body > ${selector}`;
+    return selector.slice(0,-3);
 }
 
 const contentElement = create("div#filtering-extension-content");
 updateAppearance();
 
+
+function Undo() {
+    selectedElements.pop();
+    updateAppearance();
+}
+function Done() {
+    if (selectedElements.length <= 1) throw new Error("Need to select at least 2 items");
+    
+    console.log(selector);
+    if (!selector) { alert("Error getting list selector"); throw new Error("List item selector is null")}
+
+    setConfig({ itemSelector: selector, idSelector: idSelector});
+    setAppState("working");
+}
+function Cancel() { setAppState("no-config") }
 function updateAppearance() {
     contentElement.innerHTML = "";
 
     const n = selectedElements.length;
     contentElement.append(
-        create("p",n < 2 ? (`Click ${n == 0 ? "first" : "second"} list item`) :
+        create("p",n < 2 ? (`Click ${n == 0 ? "first" : "second"} list item's unique id`) :
             "Check if whole list is inside blue box and each item is in separate red box"),
         (n > 2 ? create("p","You may need to click any item in next row") : ""),
-        (n > 1 ? create("button","Undo",{onclick: () => { selectedElements.pop(); updateAppearance(); }}) : ""),
-        create("button","Cancel",{onclick: () => setAppState("no-config")})
+        (n > 1 ? create("button","Undo",{onclick: Undo}) : ""),
+        (n > 1 ? create("button","Done",{onclick: Done}) : ""),
+        create("button","Cancel",{onclick: Cancel })
     );
 }
 
@@ -74,6 +128,7 @@ export default function(): AppStateBehavior {
             contentElement.remove();
             document.removeEventListener("pointerdown", selectItem, true);
             console.log("manual-select ended");
+            undoClassAdd();
         }
     }
 }

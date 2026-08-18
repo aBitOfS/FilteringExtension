@@ -1,5 +1,6 @@
 import { getAppState, listenAppState, validAppStates } from "./dev_utils";
 import manualSelect from "./manualSelect";
+import { workingState } from "./working";
 
 export interface AppStateBehavior { enter(): void; exit(): void }
 
@@ -13,6 +14,7 @@ let currentState: AppStateBehavior | null = null;
 
 const appStateEnterExit: Record<validAppStates, AppStateBehavior> = {
     "manual-select": manualSelect(),
+    "working": workingState(),
     "no-config": idleState(),
 };
 
