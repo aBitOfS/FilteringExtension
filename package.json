@@ -4,6 +4,7 @@
   },
   "dependencies": {
     "chrome-types": "^0.1.439",
+    "preact": "^10.29.8",
     "vite": "^8.2.1"
   }
 }

@@ -20,7 +20,8 @@ export function listenAppState(listener: () => void) {
 }
 
 export interface AppConfig {
-    listSelector: string,
+    itemSelector: string,
+    // itemTemplate: string,
 }
 let config: AppConfig | null = null;
 export function setConfig(value: AppConfig | null) {
@@ -29,13 +30,3 @@ export function setConfig(value: AppConfig | null) {
 export function getConfig() {
     return config;
 }
-
-
-
-// export function createElement(tagName: keyof HTMLElementTagNameMap, children: HTMLElement[], attributes: Record<string,string>) {
-//     const element = document.createElement(tagName);
-//     for (const [key, value] of Object.entries(attributes)) {
-//         element.setAttribute(key, value);
-//     }
-//     return element;
-// }
