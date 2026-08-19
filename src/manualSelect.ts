@@ -3,7 +3,6 @@ import { create } from "./createElementShortcuts";
 import { findCommonParent, setAppState, setConfig } from "./dev_utils";
 
 let selectedElements: HTMLElement[] = []
-// let commonParent: HTMLElement | null = null;
 let selector = "";
 let idSelector = "";
 
@@ -20,7 +19,8 @@ const [addClassWithUndo, undoClassAdd] = (() => {
 })()
 
 function selectItem(event: MouseEvent) {
-    if (contentElement.contains(event.target as HTMLElement)) return
+    if (contentElement.contains(event.target as HTMLElement)) return;
+    
     event.stopImmediatePropagation();
     event.preventDefault();
     event.stopPropagation();
@@ -122,11 +122,11 @@ export default function(): AppStateBehavior {
             selectedElements = [];
             updateAppearance();
             document.body.appendChild(contentElement);
-            document.addEventListener("pointerdown", selectItem, true);
+            document.addEventListener("click", selectItem, true);
         },
         exit() {
             contentElement.remove();
-            document.removeEventListener("pointerdown", selectItem, true);
+            document.removeEventListener("click", selectItem, true);
             console.log("manual-select ended");
             undoClassAdd();
         }

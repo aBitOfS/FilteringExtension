@@ -11,5 +11,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         
         await import("./content");
     };
+    function listenToDemoChoice() {
+	document.getElementById("demo-choice").addEventListener("change",async (el) => {
+		let demo = await fetch("./demo/"+el.target.value);	
+		document.getElementById("sample-content")!.innerHTML = await demo.text();
+
+		// Imitate webpage change
+    }
+
     mountComponentsForTesting();
+
+    listenToDemoChoice();
 });
