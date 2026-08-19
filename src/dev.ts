@@ -1,25 +1,21 @@
 document.addEventListener("DOMContentLoaded", async () => {
     async function mountComponentsForTesting() {
-        let demoFile = await fetch("./dev/media_expert.htm");
-        // let demoFile = await fetch("./dev/x-kom.htm");
-        document.getElementById("sample-content")!.innerHTML = await demoFile.text();
+        let demoUrl = window.location.search.slice(1);
+        if (demoUrl == "") demoUrl = "media-expert.htm";
+        let demo = await fetch("./demo/"+demoUrl);
+        document.getElementById("sample-content")!.innerHTML = await demo.text();
     
-        let popupFile = await fetch("./popup.html");
+        let popupFile = await fetch("./popup/popup.html");
         document.getElementById("popup")!.innerHTML = await popupFile.text();
 
-        await import("./popup");
+        await import("./popup/popup");
         
-        await import("./content");
+        await import("./content/content");
     };
-    function listenToDemoChoice() {
-	document.getElementById("demo-choice").addEventListener("change",async (el) => {
-		let demo = await fetch("./demo/"+el.target.value);	
-		document.getElementById("sample-content")!.innerHTML = await demo.text();
 
-		// Imitate webpage change
-    }
+    document.getElementById("select-demo")!.addEventListener("change", () => {
+        window.location.replace("?"+(document.getElementById("select-demo")! as HTMLSelectElement).value);
+    });
 
     mountComponentsForTesting();
-
-    listenToDemoChoice();
 });

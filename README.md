@@ -4,12 +4,18 @@ Are you bored by scrolling through products simply because filtering options are
 
 This browser extension will try to resolve those problems.
 
+# IMPORTANT:
+
+This is just the begining of this project. Done basics functionality on index.html, but not yet transformed to working browser extension.
+Need
+
 ## Features:
+
+- Allows you to manually hide unwanted items or select which are your favourite and review them later
 
 ## Planned:
 
 - Works on almost any site
-- Allows you to manually hide unwanted items or select which are your favourite and review them later
 - Allows you to filter and sort by any property visible at item list,
     #### In the future
     - on all pages of one site (so no need to click next button)
@@ -26,18 +32,31 @@ This browser extension will try to resolve those problems.
 
 ## Todo:
 
-- [ ] Manually select list element on webpage
-- [ ] Add filtering topbar on webpage (placeholder)
-- [ ] Add ignore and favourite buttons to each list item
-- [ ] Ignore button hides item
-- [ ] Favourite button saves item to favourites list
-- [ ] Favourites and ignored buttons on topbar hide full list and show relevant
+- [X] Manually select 2 list element's id on webpage
+- [X] Add filtering topbar on webpage (placeholder)
+- [X] Add ignore and favourite buttons to each list item
+- [X] Ignore button hides item
+- [X] Favourite button saves item to favourites list
+- [X] Favourites and ignored buttons on topbar hide full list and show relevant
+
+# That's done. Great
+
+- [ ] Create manifest
+- [ ] Create chrome_utils.ts with functionality of dev_utils.ts, but using extension api
+- [ ] Serialize list items better than just innerHTML (global template with params)
+
+- [ ] Switch to frontend framework (probably preact)
+
+## Needs fixing:
+
+- [X] Disable links while manually selecting items
+- [ ] Check if change of states works properly
 
 ## Usage guide
 
 1. Open popup (by clicking icon)
 -> 2. If no config, click to choose list manually (else go to step x.)
-3. Hover mouse over first list item
+3. Click first list item unique id (may be just )
 > Red border should be around 1st item and Blue around whole list.
 > Try to match it, if impossible, that site is currently unsupported
 4. HOLD Shift, while moving mouse 
