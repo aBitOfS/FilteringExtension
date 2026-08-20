@@ -1,33 +1,45 @@
-import { getAppState, listenAppState, validAppStates } from "../utils/dev_utils";
-import manualSelect from "./manualSelect";
-import { workingState } from "./working";
+// Manually remove exports = {} from generated js file
+
+import { SiteSettings } from "../utils/browser_utils";
 
 export interface AppStateBehavior { enter(): void; exit(): void }
 
-(() => {
-// interface AppState {
-//     type: string,
-//     props: Record<string,string>,
-// }
+(async () => {
+const browserApi = await (async () => {
+    if (typeof chrome !== "undefined") return chrome;
+    if (typeof browser !== "undefined") return browser;
+    else {
+        console.log("DEMO MODE");
+        return await import("../utils/dev_utils");
+    }
+})();
+
+const { getSiteSettings, subscribeSiteSettings }: typeof import("../utils/browser_utils")
+    = await import(browserApi.runtime.getURL("../utils/browser_utils"));
+const { manualSelect }: typeof import("./manualSelect")
+    = await import(browserApi.runtime.getURL("./manualSelect"));
+const { workingState }: typeof import("./working")
+    = await import(browserApi.runtime.getURL("./working"));
 
 let currentState: AppStateBehavior | null = null;
 
-const appStateEnterExit: Record<validAppStates, AppStateBehavior> = {
-    "manual-select": manualSelect(),
+const appStateEnterExit: Record<SiteSettings["state"], AppStateBehavior> = {
+    "manual": manualSelect(),
     "working": workingState(),
-    "no-config": idleState(),
+    "idle": idleState(),
+    "preview": idleState()
 };
 
-function appStateChanged() {
+async function appStateChanged() {
     currentState?.exit();
-    currentState = appStateEnterExit[getAppState()];
-    currentState.enter();
+    currentState = appStateEnterExit[(await getSiteSettings()).state];
+    await currentState.enter();
 }
 
 function idleState(): AppStateBehavior { return {enter() {},exit() {}}}
 
 function init() {
-    listenAppState(appStateChanged);
+    subscribeSiteSettings(appStateChanged);
     appStateChanged();
 
     // Add styles (here or in manifest.json)

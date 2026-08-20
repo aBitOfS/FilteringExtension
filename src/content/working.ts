@@ -1,6 +1,7 @@
 import { AppStateBehavior } from "./content";
 import { create } from "../utils/createElementShortcuts";
-import { findCommonParent, getConfig, setAppState } from "../utils/dev_utils";
+import { getSiteSettings, setSiteSettings } from "../utils/browser_utils";
+import { findCommonParent } from "../utils/utils";
 
 const itemsListElement = create("div#fil-ext-list");
 const contentElement = create("div#fil-ext-content",[
@@ -9,7 +10,7 @@ const contentElement = create("div#fil-ext-content",[
         create("button","Not ignored", () => showWithout(ignored)),
         create("button","All (with ignored)", () => showWithout()),
         create("button","Ignored", () => showOnly(ignored)),
-        create("button","Disable extension", () => setAppState("no-config"))
+        create("button","Disable extension", () => setSiteSettings({ state: "idle"}))
     ]),
     itemsListElement
 ]);
@@ -72,11 +73,9 @@ let favourites: string[] = [];
 let ignored: string[] = [];
 
 export function workingState(): AppStateBehavior {
-    return { enter: () => {
-        let config = getConfig();
-        if (! config) { setAppState("no-config"); return }
-
-        console.log(config);
+    return { enter: async () => {
+        let config = await getSiteSettings();
+        if (config.state != "working" || ! config.itemSelector || ! config.idSelector) { setSiteSettings({ state: "idle" }); return }
 
         originalItems = Array.from(document.querySelectorAll(config.itemSelector)); 
         originalItems.forEach((el) => {

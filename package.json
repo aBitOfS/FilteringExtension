@@ -4,6 +4,7 @@
   },
   "dependencies": {
     "chrome-types": "^0.1.439",
+    "opencode-ai": "^1.18.19",
     "preact": "^10.29.8",
     "vite": "^8.2.1"
   }
