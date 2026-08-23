@@ -1,12 +1,12 @@
 // Manually remove exports = {} from generated js file
 
-import { listenToIconClick, setSiteSettings, SiteSettings } from "../utils/browser_utils";
+import { listenToIconClick, setSiteSettings, SiteSettings } from "./utils/browser_utils";
 
 export interface AppStateBehavior { enter(): void; exit(): void }
 
-import { getSiteSettings, subscribeSiteSettings } from "../utils/browser_utils";
-import { manualSelect } from "./manualSelect";
-import { workingState } from "./working";
+import { getSiteSettings, subscribeSiteSettings } from "./utils/browser_utils";
+import { manualSelect } from "./content/manualSelect";
+import { workingState } from "./content/working";
 
 // import * as dev_utils frolm "../utils/dev_utils";
 

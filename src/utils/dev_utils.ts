@@ -10,7 +10,7 @@ export function getStorage() {
 }
 let localStorage: Record<string,object> = {};
 let listeners: ((a: any) => void)[] = [];
-console.log("DEV UTILS")
+console.warn("DEV_UTILS loaded (shouldn't if it's built as extension)");
 
 export const storage =  {
     local: {
@@ -53,8 +53,20 @@ export const tabs =  {
     },
 };
 
+const listenersToStart: ((message: any, sender: any, sendResponse: (response?: any) => void) => (boolean | Promise<any>) | undefined)[] = [];
 export const runtime = {
     getURL(url: string) {
         return url;
+    },
+    onMessage: {
+        addListener(callback: (message: any, sender: any, sendResponse: (response?: any) => void) => (boolean | Promise<any>) | undefined) {
+            listenersToStart.push(callback)
+        }
     }
+}
+
+export function devStartContentScript() {
+    listenersToStart.forEach((value) => {
+        value({ type: "iconClicked" }, null, (a: any) => {});
+    })
 }

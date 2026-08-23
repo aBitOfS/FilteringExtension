@@ -69,7 +69,7 @@ export function subscribeSiteSettings(listener: (changes: { [name: string]: chro
     return (() => browserStorage().onChanged.removeListener(listener));
 }
 export function listenToIconClick(listener: () => void) {
-    chrome.runtime.onMessage.addListener((message,sender,response) => {
+    browserApi.runtime.onMessage.addListener((message,sender,response) => {
         if (message.type ==  "iconClicked") {
             listener();
         }

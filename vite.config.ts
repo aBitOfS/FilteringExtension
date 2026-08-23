@@ -11,9 +11,10 @@ function copyExtensionFiles(): Plugin {
         name: "copy-extension-files",
         apply: "build",
         closeBundle() {
-            mkdirSync(resolve(root, outDir, "content"), { recursive: true });
+            // mkdirSync(resolve(root, outDir, "content"), { recursive: true });
             cpSync(resolve(root, "src/manifest.json"), resolve(root, outDir, "manifest.json"));
-            cpSync(resolve(root, "src/content/content.css"), resolve(root, outDir, "content/content.css"));
+            cpSync(resolve(root, "src/content.css"), resolve(root, outDir, "content.css"));
+            cpSync(resolve(root, "src/favicon.svg"), resolve(root, outDir, "favicon.svg"));
         }
     };
 }
@@ -30,13 +31,21 @@ export default defineConfig(({ mode }) => {
             minify: false,
             rollupOptions: {
                 input: buildingContent
-                    ? { "content/content": resolve(root, "src/content/content.ts") }
+                    ? { content: resolve(root, "src/content.ts") }
                     : { background: resolve(root, "src/background.ts") },
                 output: {
                     format: "iife",
                     entryFileNames: "[name].js"
                 }
             }
-        }
+        },
+        server: {
+            host: true, // Nasłuchuj na wszystkich adresach, umożliwiając dostęp z Windowsa
+            port: 5173, // Domyślny port Vite
+            strictPort: true,
+            hmr: {
+            clientPort: 5173, // Wymusza poprawne przekazywanie portu dla HMR
+            },
+        },
     };
 });

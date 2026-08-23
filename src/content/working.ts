@@ -1,4 +1,4 @@
-import { AppStateBehavior } from "./content";
+import { AppStateBehavior } from "../content";
 import { create } from "../utils/createElementShortcuts";
 import { getSiteSettings, setSiteSettings } from "../utils/browser_utils";
 import { findCommonParent } from "../utils/utils";
@@ -10,12 +10,26 @@ const contentElement = create("div#fil-ext-content",[
         create("button","Not ignored", () => showWithout(ignored)),
         create("button","All (with ignored)", () => showWithout()),
         create("button","Ignored", () => showOnly(ignored)),
+        create("button","Sort alphabetically", () => {
+            items.sort((itemA, itemB) => (itemA.id > itemB.id ? 1 : -1));
+            showFiltered();
+        }),
+        create("button","Refresh (to get lazyloaded images)", () => setSiteSettings({ state: "unset"})),
         create("button","Disable extension", () => setSiteSettings({ state: "unset"}))
     ]),
     itemsListElement
 ]);
 
-function showFiltered(filteringFunction: (item: ItemType) => boolean) {
+type ItemType = { id: string, originalData: { innerHTML: string}, addedData?: object };
+let originalItems: HTMLElement[];
+let items: ItemType[] = [];
+
+let favourites: string[] = [];
+let ignored: string[] = [];
+
+let nowShown: (item: ItemType) => boolean = ((el) => !ignored.includes(el.id));
+function showFiltered(filteringFunction: (item: ItemType) => boolean = nowShown) {
+    nowShown = filteringFunction;
     itemsListElement.innerHTML = "";
 
     items.forEach((el) => {
@@ -39,38 +53,32 @@ function showFiltered(filteringFunction: (item: ItemType) => boolean) {
 }
 
 function showWithout(blacklistedIds: string[] = []) {
-    itemsListElement.innerHTML = "";
-
-    items.forEach((el) => {
-        if (blacklistedIds.includes(el.id)) return;
-        
-        let element = create("div",el.originalData.innerHTML);
-        element.append(
-            create("div.fil-ext-item-controls",[
-                create("button","Ignore", () => {
-                    ignored.push(el.id);
-                    element.remove();
-                }),
-                create("button","Favourite", () => {
-                    favourites.push(el.id);
-                    element.style.color = "pink";
-                })
-            ])
-        );
-        itemsListElement.append(element);
-    });
+    showFiltered((el) => !blacklistedIds.includes(el.id))
 }
 function showOnly(whitelisted: string[]) {
     showFiltered((item) => whitelisted.includes(item.id));
 }
 
+function updateItems(itemElements: HTMLElement[], idSelector: string) {
+    itemElements.forEach((el) => {
+        let id = (el.querySelector(idSelector) as HTMLElement)?.innerText;
+        if (!id) {console.error("id not found"); return;}
 
-type ItemType = { id: string, originalData: { innerHTML: string}, addedData?: object };
-let originalItems: HTMLElement[];
-let items: ItemType[] = [];
+        let alreadyListed = false;
+        items.forEach((item) => {
+            if (item.id != id) return;
 
-let favourites: string[] = [];
-let ignored: string[] = [];
+            alreadyListed = true;
+            // vvv Hope this modifies reference, not copy vvv
+            item.originalData.innerHTML = el.innerHTML;
+            // Check it
+        });
+        if (alreadyListed) return;
+
+        items.push({id: id, originalData: { innerHTML: el.innerHTML }});
+    });
+    showFiltered();
+}
 
 export function workingState(): AppStateBehavior {
     return { enter: async () => {
@@ -78,23 +86,25 @@ export function workingState(): AppStateBehavior {
         if (config.state != "working" || ! config.itemSelector || ! config.idSelector) { setSiteSettings({ state: "unset" }); return }
 
         originalItems = Array.from(document.querySelectorAll(config.itemSelector)); 
+        let parent = findCommonParent(originalItems);
+
+        if (!parent) throw new Error("No parent element found");
+
         originalItems.forEach((el) => {
             let id = el.querySelector(config.idSelector) as HTMLElement;
-            if (!id) {console.error("id not found"); return;}
+            if (!id) {console.error("1. id not found"); return;}
 
-            items.push({id: id.innerText, originalData: { innerHTML: el.innerHTML }});
+            // items.push({id: id.innerText, originalData: { innerHTML: el.innerHTML }});
         });
-        
-        let parent = findCommonParent(originalItems);
-        console.log(parent);
-        if (!parent) throw new Error("No parent element found");
+
+        updateItems(originalItems, config.idSelector);
 
         parent.parentElement?.insertBefore(contentElement,parent);
         parent.style.display = "none";
-
-        showWithout(ignored);
     }, exit: () => {
-        (contentElement.nextSibling! as HTMLElement).style.display = "block";
-        contentElement.remove();
+        if (contentElement.parentElement) {
+            (contentElement.nextSibling! as HTMLElement).style.display = "block";
+            contentElement.remove();
+        }
     }};
 }

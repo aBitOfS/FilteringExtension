@@ -1,4 +1,4 @@
-import { AppStateBehavior } from "./content";
+import { AppStateBehavior } from "../content";
 import { create } from "../utils/createElementShortcuts";
 import { findCommonParent, getQuerySelectorAll } from "../utils/utils";
 import { setSiteSettings } from "../utils/browser_utils";
