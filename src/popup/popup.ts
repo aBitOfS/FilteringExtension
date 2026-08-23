@@ -1,13 +1,22 @@
-import { getAppState, setAppState } from "../utils/dev_utils";
-(() => {
+// import { setSiteSettings } from "../utils/browser_utils";
+
+(async () => {
+const browserApi = await (async () => {
+    if (typeof chrome !== "undefined") return chrome;
+    if (typeof browser !== "undefined") return browser;
+    else {
+        console.log("DEMO MODE");
+        return await import("../utils/dev_utils");
+    }
+})();
+
+const { setSiteSettings } = await import(browserApi.runtime.getURL("../utils/browser_utils"));
+
+// setSiteSettings({state: "manual"});
 function init() {
-    getAppState();
 
     document.querySelector("#manual-select-btn")!.addEventListener("click", () => {
-        setAppState("manual-select");
-    });
-    document.querySelector("#manual-select-cancel-btn")!.addEventListener("click", () => {
-        setAppState("no-config");
+        setSiteSettings({state: "manual"});
     });
     console.log("Popup script initalized");
 }
@@ -15,4 +24,4 @@ function init() {
 if (document.readyState === "loading")
     document.addEventListener("DOMContentLoaded", init);
 else init();
-})()
+})();

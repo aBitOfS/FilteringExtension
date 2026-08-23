@@ -1,4 +1,15 @@
 {
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "rm -rf dist && vite build --mode content && vite build --mode background",
+    "build:content": "vite build --mode content",
+    "build:background": "vite build --mode background",
+    "watch": "npm run watch:content & npm run watch:background & wait",
+    "watch:content": "vite build --mode content --watch",
+    "watch:background": "vite build --mode background --watch",
+    "typecheck": "tsc --noEmit"
+  },
   "devDependencies": {
     "typescript": "^7.0.2"
   },

@@ -1,0 +1,38 @@
+{
+    "manifest_version": 3,
+    
+    "name": "Filtering Extension",
+    "version": "0.1",
+    "description": "Allows to filter and sort lists on websites using custom setting",
+    
+    "icons": {
+
+        "48": "favicon.svg"
+    },
+
+    "permissions": ["storage"],
+    "action": {
+        "default_icon": "icon.png",
+        "default_title": "Kliknij, aby przefiltrować"
+    },
+
+    "background": {
+        "service_worker": "background.js",
+        "scripts": ["background.js"]
+    },
+
+    "content_scripts": [
+        {
+            "matches": ["*://*/*"],
+            "js": ["content/content.js"],
+            "css": ["content/content.css"]
+        }
+    ],
+    
+    "web_accessible_resources": [
+        {
+            "resources": ["*"],
+            "matches": ["*://*/*"]
+        }
+    ]
+}

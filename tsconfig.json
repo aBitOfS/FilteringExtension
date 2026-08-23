@@ -2,11 +2,15 @@
     "compilerOptions": {
         "rootDir": "./src",
         "outDir": "./built",
+        "noEmit": true,
 
         "allowJs": true,
         "strict": true,
         
         "types":["chrome-types"],
+
+        "jsx": "react-jsx",
+        "jsxImportSource": "preact",
 
         "target": "es2025",
         "module": "esnext",

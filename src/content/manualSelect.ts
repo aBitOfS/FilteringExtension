@@ -1,6 +1,7 @@
 import { AppStateBehavior } from "./content";
 import { create } from "../utils/createElementShortcuts";
-import { findCommonParent, setAppState, setConfig } from "../utils/dev_utils";
+import { findCommonParent, getQuerySelectorAll } from "../utils/utils";
+import { setSiteSettings } from "../utils/browser_utils";
 
 let selectedElements: HTMLElement[] = []
 let selector = "";
@@ -26,24 +27,30 @@ function selectItem(event: MouseEvent) {
     event.stopPropagation();
 
     selectedElements.push(event.target as HTMLElement);
+    selectedElementsChanged();
+}
+async function selectedElementsChanged() {
     undoClassAdd();
 
     updateAppearance();
     if (selectedElements.length < 2) return;
 
-    let listItem = getItemFromItsChild(selectedElements[0],selectedElements[1]);
-    selector = getQuerySelector(listItem) ?? "";
+    let listItems = selectedElements.map((v,i) => {
+        return getItemFromItsChild(v,selectedElements[(i+1)%selectedElements.length]);
+    })
+    selector = await getQuerySelectorAll(listItems);
+    console.log(selector)
 
     // Add Handle different selectors (like recommended products)
 
-    if (selector != "") {
-        idSelector = getQuerySelector(selectedElements[0],listItem) ?? "";
-        document.querySelectorAll(selector).forEach((el) => {
-            addClassWithUndo(el,"fil-ext-m-item");
-            addClassWithUndo(el.querySelector(idSelector),"fil-ext-m-id");
-        });
-        addClassWithUndo(findCommonParent(selectedElements),"fil-ext-m-parent");
-    }
+    console.log(selectedElements);
+    idSelector = await getQuerySelectorAll(selectedElements,listItems[0]);
+    console.log(idSelector)
+    document.querySelectorAll(selector).forEach((el) => {
+        addClassWithUndo(el,"fil-ext-m-item");
+        addClassWithUndo(el.querySelector(idSelector),"fil-ext-m-id");
+    });
+    addClassWithUndo(findCommonParent(selectedElements),"fil-ext-m-parent");
 }
 
 function getItemFromItsChild(itemChild: HTMLElement, siblingChild: HTMLElement): HTMLElement {
@@ -87,7 +94,7 @@ updateAppearance();
 
 function Undo() {
     selectedElements.pop();
-    updateAppearance();
+    selectedElementsChanged();
 }
 function Done() {
     if (selectedElements.length <= 1) throw new Error("Need to select at least 2 items");
@@ -95,25 +102,25 @@ function Done() {
     console.log(selector);
     if (!selector) { alert("Error getting list selector"); throw new Error("List item selector is null")}
 
-    setConfig({ itemSelector: selector, idSelector: idSelector});
-    setAppState("working");
+    setSiteSettings({ state: "working", itemSelector: selector, idSelector: idSelector});
 }
-function Cancel() { setAppState("no-config") }
+function Cancel() { setSiteSettings({ state: "idle" }) }
 function updateAppearance() {
     contentElement.innerHTML = "";
-
+    
     const n = selectedElements.length;
+
     contentElement.append(
         create("p",n < 2 ? (`Click ${n == 0 ? "first" : "second"} list item's unique id`) :
             "Check if whole list is inside blue box and each item is in separate red box"),
-        (n > 2 ? create("p","You may need to click any item in next row") : ""),
-        (n > 1 ? create("button","Undo",{onclick: Undo}) : ""),
+        (n >= 2 ? create("p","You may need to click any item in next row") : ""),
+        (n >= 1 ? create("button","Undo",{onclick: Undo}) : ""),
         (n > 1 ? create("button","Done",{onclick: Done}) : ""),
         create("button","Cancel",{onclick: Cancel })
     );
 }
 
-export default function(): AppStateBehavior {
+export function manualSelect(): AppStateBehavior {
 
     return {
         enter() {

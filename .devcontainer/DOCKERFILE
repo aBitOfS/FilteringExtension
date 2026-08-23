@@ -1,0 +1,14 @@
+FROM mcr.microsoft.com/devcontainers/typescript-node:5-24-trixie
+
+WORKDIR /app
+
+# Copy package files and install dependencies
+COPY package.json package-lock.json* ./
+RUN npm install
+
+# Copy source (watch mode will sync from VS Code)
+COPY . .
+
+# Vite dev server
+EXPOSE 5173
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
