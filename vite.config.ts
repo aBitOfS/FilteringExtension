@@ -17,10 +17,23 @@ function copyExtensionFiles(): Plugin {
         }
     };
 }
+function copyDemoFiles(): Plugin {
+    return {
+        name: "copy-demo-files",
+        apply: "build",
+        closeBundle() {
+            cpSync(resolve(root, "demoData"),resolve(root,"demo/demoData"),{"recursive": true});
+        }
+    };
+}
 
 export default defineConfig(({ mode }) => {
     const buildingContent = mode === "content";
 
+    if (mode === "demo") {
+        console.log("Manually copy demoData/ to demo/demoData/");
+        return { "build": { outDir: "demo", emptyOutDir: false }, plugins: [copyDemoFiles()] };
+    }
     return {
         plugins: [copyExtensionFiles()],
         build: {

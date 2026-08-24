@@ -16,8 +16,6 @@
     "optional_host_permissions": ["*://*/*"],
 
     "action": {
-        // Replace with new
-        // "default_icon": "icon.svg",
         "default_title": "Kliknij, aby przefiltrować"
     },
 

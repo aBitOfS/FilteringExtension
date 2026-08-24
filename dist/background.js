@@ -39,6 +39,7 @@
 			if (query) {
 				let obj = {};
 				if (localStorage[query]) obj[query] = localStorage[query];
+				else obj[query] = { "state": "unset" };
 				return obj;
 			}
 			return localStorage;
@@ -79,9 +80,6 @@
 			value({ type: "iconClicked" }, null, (a) => {});
 		});
 	}
-	//#endregion
-	//#region src/utils/browser_utils.ts
-	if (typeof chrome === "undefined") chrome = browser;
 	(() => {
 		if (typeof chrome !== "undefined") return chrome;
 		if (typeof browser !== "undefined") return browser;

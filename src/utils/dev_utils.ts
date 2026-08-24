@@ -20,6 +20,9 @@ export const storage =  {
                 if (localStorage[query]) {
                     obj[query] = localStorage[query]; 
                 }
+                else {
+                    obj[query] = {"state":"unset"};
+                }
                 return obj;
             }
             return localStorage;

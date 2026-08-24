@@ -1,7 +1,8 @@
 {
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "demo": "vite",
+    "build:demo": "vite build --mode demo",
     "build": "vite build --mode content && vite build --mode background",
     "build:content": "vite build --mode content",
     "build:background": "vite build --mode background",
@@ -11,11 +12,12 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "typescript": "^7.0.2"
+    "preact": "^10.29.8",
+    "vite": "^8.2.1",
+    "typescript": "^7.0.2",
+    "chrome-types": "^0.1.439",
+    "@types/node": "^26.2.0"
   },
   "dependencies": {
-    "chrome-types": "^0.1.439",
-    "preact": "^10.29.8",
-    "vite": "^8.2.1"
   }
 }

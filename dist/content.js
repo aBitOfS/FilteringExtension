@@ -76,6 +76,7 @@
 			if (query) {
 				let obj = {};
 				if (localStorage[query]) obj[query] = localStorage[query];
+				else obj[query] = { "state": "unset" };
 				return obj;
 			}
 			return localStorage;
@@ -118,7 +119,6 @@
 	}
 	//#endregion
 	//#region src/utils/browser_utils.ts
-	if (typeof chrome === "undefined") chrome = browser;
 	var browserApi = (() => {
 		if (typeof chrome !== "undefined") return chrome;
 		if (typeof browser !== "undefined") return browser;

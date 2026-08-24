@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Filtering Extension Demo</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; font-family: sans-serif; }
+
+        #header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 12px;
+            background: #1a1a2e;
+            color: #eee;
+            border-bottom: 2px solid #16213e;
+            height: 48px;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
+            font-size: large;
+        }
+
+        #demo-select {
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid #555;
+            background: #0f3460;
+            color: #eee;
+        }
+
+        #header main {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+        #header main button {
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid #555;
+            background: #0f3460;
+            color: #eee;
+            cursor: pointer;
+        }
+
+        #demo-content {
+            position: fixed;
+            top: 48px; left: 0; right: 0; bottom: 0;
+            overflow: auto;
+        }
+    </style>
+  <script type="module" crossorigin src="/assets/index-OJ2m8pUe.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DaLI_7qD.css">
+</head>
+<body>
+    <div id="header">
+        <select id="demo-select">
+            <option value="demoData/media-expert.htm">Media Expert</option>
+            <option value="demoData/x-kom.html">x-kom</option>
+            <option value="demoData/rtv-euro-agd.html">RTVeuroAGD</option>
+        </select>
+        <main>
+            <button id="demo-start">START</button>
+            <a href="/"><button>RESET DEMO</button></a>
+        </main>
+    </div>
+    <div id="demo-content"></div>
+
+</body>
+</html>

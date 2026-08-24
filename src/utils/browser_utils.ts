@@ -1,14 +1,8 @@
 // IMPORTANT may need to use local, sync may need Addon Id
 // browser.storage.sync.get()
 
-// WON'T WORK ON NOT BACKGROUND SCRIPT
-// browserApi.tabs.query({ currentWindow: true, active: true });
-
 import { alogResuilt } from "./utils";
 import * as dev_utils from "./dev_utils";
-
-// @ts-expect-error
-if (typeof chrome === "undefined") chrome = browser;
 
 const browserApi = (() => {
     if (typeof chrome !== "undefined") return chrome;

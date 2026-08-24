@@ -6,8 +6,8 @@ This browser extension will try to resolve those problems.
 
 # IMPORTANT:
 
-This is just the begining of this project. Done basics functionality on index.html, but not yet transformed to working browser extension.
-Need
+This is just the begining of this project. Many features currently unsupported.
+You can see it in action [here](https://abitofs.github.io/FilteringExtension/)
 
 ## Features:
 
