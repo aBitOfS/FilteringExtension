@@ -104,7 +104,7 @@ function Done() {
 
     setSiteSettings({ state: "working", itemSelector: selector, idSelector: idSelector});
 }
-function Cancel() { setSiteSettings({ state: "idle" }) }
+function Cancel() { setSiteSettings({ state: "unset" }) }
 function updateAppearance() {
     contentElement.innerHTML = "";
     

@@ -14,7 +14,6 @@ function copyExtensionFiles(): Plugin {
             // mkdirSync(resolve(root, outDir, "content"), { recursive: true });
             cpSync(resolve(root, "src/manifest.json"), resolve(root, outDir, "manifest.json"));
             cpSync(resolve(root, "src/content.css"), resolve(root, outDir, "content.css"));
-            cpSync(resolve(root, "src/favicon.svg"), resolve(root, outDir, "favicon.svg"));
         }
     };
 }
@@ -44,7 +43,10 @@ export default defineConfig(({ mode }) => {
             port: 5173, // Domyślny port Vite
             strictPort: true,
             hmr: {
-            clientPort: 5173, // Wymusza poprawne przekazywanie portu dla HMR
+                clientPort: 5173, // Wymusza poprawne przekazywanie portu dla HMR
+            },
+            watch: {
+                usePolling: true, // Maybe fix checking changes with wsl on windows fs (should work without on linux fs)
             },
         },
     };

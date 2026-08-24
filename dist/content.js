@@ -50,6 +50,7 @@
 	//#endregion
 	//#region src/utils/dev_utils.ts
 	var dev_utils_exports = /* @__PURE__ */ __exportAll({
+		devStartContentScript: () => devStartContentScript,
 		getStorage: () => getStorage,
 		runtime: () => runtime,
 		setStorage: () => setStorage,
@@ -69,7 +70,7 @@
 	}
 	var localStorage = {};
 	var listeners = [];
-	console.log("DEV UTILS");
+	console.warn("DEV_UTILS loaded (shouldn't if it's built as extension)");
 	var storage = { local: {
 		async get(query) {
 			if (query) {
@@ -101,11 +102,23 @@
 	var tabs = { async query(queryInfo) {
 		return [{ url }];
 	} };
-	var runtime = { getURL(url) {
-		return url;
-	} };
+	var listenersToStart = [];
+	var runtime = {
+		getURL(url) {
+			return url;
+		},
+		onMessage: { addListener(callback) {
+			listenersToStart.push(callback);
+		} }
+	};
+	function devStartContentScript() {
+		listenersToStart.forEach((value) => {
+			value({ type: "iconClicked" }, null, (a) => {});
+		});
+	}
 	//#endregion
 	//#region src/utils/browser_utils.ts
+	if (typeof chrome === "undefined") chrome = browser;
 	var browserApi = (() => {
 		if (typeof chrome !== "undefined") return chrome;
 		if (typeof browser !== "undefined") return browser;
@@ -117,20 +130,20 @@
 	function browserStorage() {
 		return browserApi.storage.local;
 	}
-	async function getUrl() {
-		return window.location.origin;
+	function storageKeyFromUrl(url) {
+		return url.split("://")[1].split("/")[0];
 	}
 	async function getSiteSettings() {
 		return alogResuilt(async () => {
-			let url = await getUrl();
+			let url = storageKeyFromUrl(window.location.origin);
 			if (!url) return { state: "unset" };
 			let data = (await browserStorage().get(url))[url];
-			if (!data) return { state: "unset" };
+			if (!data) return { state: "manual" };
 			return data;
-		}, await getUrl() ?? "");
+		}, storageKeyFromUrl(window.location.origin) ?? "");
 	}
 	async function setSiteSettings(siteSettings) {
-		let url = await getUrl();
+		let url = storageKeyFromUrl(window.location.origin);
 		if (!url) return false;
 		const data = {};
 		data[url] = siteSettings;
@@ -148,8 +161,11 @@
 		return (() => browserStorage().onChanged.removeListener(listener));
 	}
 	function listenToIconClick(listener) {
-		chrome.runtime.onMessage.addListener((message, sender, response) => {
-			if (message.type == "iconClicked") listener();
+		browserApi.runtime.onMessage.addListener((message, sender, sendResponse) => {
+			if (message.type == "iconClicked") {
+				listener();
+				sendResponse({ type: "captured" });
+			}
 		});
 	}
 	//#endregion
@@ -234,7 +250,7 @@
 		});
 	}
 	function Cancel() {
-		setSiteSettings({ state: "idle" });
+		setSiteSettings({ state: "unset" });
 	}
 	function updateAppearance() {
 		contentElement$1.innerHTML = "";
@@ -266,8 +282,9 @@
 		create("button", "Not ignored", () => showWithout(ignored)),
 		create("button", "All (with ignored)", () => showWithout()),
 		create("button", "Ignored", () => showOnly(ignored)),
-		create("button", "Sort alphabetically (then choose filtering to apply)", () => {
+		create("button", "Sort alphabetically", () => {
 			items.sort((itemA, itemB) => itemA.id > itemB.id ? 1 : -1);
+			showFiltered();
 		}),
 		create("button", "Refresh (to get lazyloaded images)", () => setSiteSettings({ state: "unset" })),
 		create("button", "Disable extension", () => setSiteSettings({ state: "unset" }))
@@ -301,7 +318,7 @@
 	}
 	function updateItems(itemElements, idSelector) {
 		itemElements.forEach((el) => {
-			let id = el.querySelector(idSelector).innerText;
+			let id = el.querySelector(idSelector)?.innerText;
 			if (!id) {
 				console.error("id not found");
 				return;
@@ -331,6 +348,12 @@
 				originalItems = Array.from(document.querySelectorAll(config.itemSelector));
 				let parent = findCommonParent(originalItems);
 				if (!parent) throw new Error("No parent element found");
+				originalItems.forEach((el) => {
+					if (!el.querySelector(config.idSelector)) {
+						console.error("1. id not found");
+						return;
+					}
+				});
 				updateItems(originalItems, config.idSelector);
 				parent.parentElement?.insertBefore(contentElement, parent);
 				parent.style.display = "none";

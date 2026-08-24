@@ -6,13 +6,18 @@
     "description": "Allows to filter and sort lists on websites using custom setting",
     
     "icons": {
-
-        "48": "favicon.svg"
+        "16": "icons/icon16.png",
+        "32": "icons/icon32.png",
+        "48": "icons/icon48.png",
+        "128": "icons/icon128.png"
     },
 
-    "permissions": ["storage"],
+    "permissions": ["storage", "scripting", "activeTab"],
+    "optional_host_permissions": ["*://*/*"],
+
     "action": {
-        "default_icon": "favicon.svg",
+        // Replace with new
+        // "default_icon": "icon.svg",
         "default_title": "Kliknij, aby przefiltrować"
     },
 
@@ -20,14 +25,6 @@
         "service_worker": "background.js",
         "scripts": ["background.js"]
     },
-
-    "content_scripts": [
-        {
-            "matches": ["*://*/*"],
-            "js": ["content.js"],
-            "css": ["content.css"]
-        }
-    ],
     
     "web_accessible_resources": [
         {

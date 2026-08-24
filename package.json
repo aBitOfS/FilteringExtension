@@ -2,7 +2,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "rm -rf dist && vite build --mode content && vite build --mode background",
+    "build": "vite build --mode content && vite build --mode background",
     "build:content": "vite build --mode content",
     "build:background": "vite build --mode background",
     "watch": "npm run watch:content & npm run watch:background & wait",
