@@ -13,7 +13,7 @@ You can see it in action [here](https://abitofs.github.io/FilteringExtension/)
 
 - Allows you to manually hide unwanted items or select which are your favourite and review them later
 
-## Planned:
+### Planned:
 
 - Works on almost any site
 - Allows you to filter and sort by any property visible at item list,
@@ -32,31 +32,39 @@ You can see it in action [here](https://abitofs.github.io/FilteringExtension/)
 
 ## Todo:
 
-- [X] Manually select 2 list element's id on webpage
-- [X] Add filtering topbar on webpage (placeholder)
-- [X] Add ignore and favourite buttons to each list item
-- [X] Ignore button hides item
-- [X] Favourite button saves item to favourites list
-- [X] Favourites and ignored buttons on topbar hide full list and show relevant
+- [ ] Create proper frontend with preact
+    - [ ] Explain permission popup
+    - [ ] Guided manual setup
+    - [ ] Filters
+    - [ ] Each item controls
 
-# That's done. Great
-
-- [ ] Create manifest
-- [ ] Create chrome_utils.ts with functionality of dev_utils.ts, but using extension api
+- [ ] Test askedForPermission message
 - [ ] Serialize list items better than just innerHTML (global template with params)
-
-- [ ] Switch to frontend framework (probably preact)
-
-## Needs fixing:
-
-- [X] Disable links while manually selecting items
-- [ ] Check if change of states works properly
 
 ## Usage guide
 
-1. Open popup (by clicking icon)
--> 2. If no config, click to choose list manually (else go to step x.)
-3. Click first list item unique id (may be just )
-> Red border should be around 1st item and Blue around whole list.
-> Try to match it, if impossible, that site is currently unsupported
-4. HOLD Shift, while moving mouse 
+### Installation
+
+### New webpage setup
+
+1. Click icon (if pinned)/extensions -> Filtering Extension
+2. Click allow if you want this extension to run everytime and deny if only once
+3. Click 2 list items' unique ids (may be names if unique)
+> Links and buttons are disabled - no need to worry about clicking sth wrong
+4. Check if items are detected correctly
+> Red border should be around each item, blue around whole list and green highlight on all ids.
+> If not matched try clicking other items' ids, especially in next row (if grid)
+5. Click done.
+
+### Marking and filtering items
+
+- You can click favourite or ignore button under each item to add it to that category
+- Then you can view them by clicking appreciable button over the list
+
+## Issues
+
+### Items not detected correctly
+
+### No images/dynamicly loaded data on items
+
+### Wrong styling

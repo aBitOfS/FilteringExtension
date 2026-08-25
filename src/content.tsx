@@ -7,6 +7,7 @@ export interface AppStateBehavior { enter(): void; exit(): void }
 import { getSiteSettings, subscribeSiteSettings } from "./utils/browser_utils";
 import { manualSelect } from "./content/manualSelect";
 import { workingState } from "./content/working";
+import { render } from "preact";
 
 (async () => {
 let currentState: AppStateBehavior | null = null;
@@ -25,7 +26,18 @@ async function appStateChanged() {
 
 function idleState(): AppStateBehavior { return {enter() {},exit() {}}}
 
+function App() {
+    return <div>TEST</div>;
+}
+
+function mount() {
+    let mount = document.createElement("div");
+    mount.id = "fil-ext-main";
+    document.body.appendChild(mount);
+    render(<App />,mount);
+}
 function init() {
+    mount();
     subscribeSiteSettings(appStateChanged);
     listenToIconClick(async () => {
         let currentSettings: SiteSettings = await getSiteSettings();

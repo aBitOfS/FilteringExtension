@@ -68,3 +68,21 @@ export function listenToIconClick(listener: () => void) {
         }
     })
 }
+
+export function toggleSiteState(url: string, mode: undefined | "on" | "off") {
+    // let currentSettings: SiteSettings = await getSiteSettings();
+    // switch (currentSettings.state) {
+    //     case "idle":
+    //         setSiteSettings({...currentSettings, state: "working"});
+    //         break;
+    //     case "working":
+    //         setSiteSettings({...currentSettings, state: "idle"});
+    //         break;
+    //     case "unset":
+    //         setSiteSettings({state:"manual"});
+    //         break;
+    //     default:
+    //         setSiteSettings({state: "unset"});
+    //         break;
+    // }
+}

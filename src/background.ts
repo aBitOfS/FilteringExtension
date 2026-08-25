@@ -1,59 +1,50 @@
-import { SiteSettings, storageKeyFromUrl } from "./utils/browser_utils";
+import { sendMessage, setupStorage, setupMessagesListener } from "./utils/browserUtils";
 
 (() => {
-// @ts-expect-error
-if (typeof chrome === "undefined") chrome = browser;
+const scripting = (typeof chrome !== "undefined") ? chrome.scripting : browser.scripting;
+const permissions = (typeof chrome !== "undefined") ? chrome.permissions : browser.permissions;
 
-chrome.action.onClicked.addListener(async (tab) => {
+
+((typeof chrome !== "undefined") ? chrome.action : browser.action).onClicked.addListener(async (tab) => {
     if (!tab.id || !tab.url || !tab.url.startsWith("http")) return; // Needs activeTab for url
-    let url = storageKeyFromUrl(tab.url);
+
+    const utils = setupStorage(tab.url);
 
     // Need to do before any async call:
-    registerContentScript(url);
+    registerContentScript(utils);
 
     if (await notifyIconPressedAndCheckContentScriptPresent(tab.id)) return;
     
-    await injectContentScriptOnce(tab.id, url);
+    await injectContentScriptOnce(tab.id, utils);
 
-    console.log(await chrome.scripting.getRegisteredContentScripts());
+    console.log(await scripting.getRegisteredContentScripts());
 });
 
-async function enableContentScriptIfDisabled(url: string) {
-    let siteSettings: Record<string,SiteSettings> = (await chrome.storage.local.get(url));
-    console.log(siteSettings);
-    if (!siteSettings[url]) return;
-
-    if (siteSettings[url].state == "idle") {
-        siteSettings[url].state = "working";
-        chrome.storage.local.set(siteSettings);
-    }
-    else if (siteSettings[url].state == "unset") {
-        siteSettings[url].state = "manual";
-        chrome.storage.local.set(siteSettings);
-    }
-}
-
-async function injectContentScriptOnce(tabId: number, url: string) {
-    await enableContentScriptIfDisabled(url);
-    chrome.scripting.executeScript({
+async function injectContentScriptOnce(tabId: number, utils: ReturnType<typeof setupStorage>) {
+    await utils.toggleSiteState("on");
+    await scripting.executeScript({
         "target": { "tabId": tabId },
         "files": ["content.js"],
     });
-    chrome.scripting.insertCSS({
+    scripting.insertCSS({
         "target": { "tabId": tabId },
         "files": ["content.css"]
     });
     console.log("Injected one time");
+
+    if (await permissions.contains({"origins": [utils.originMatch]})) return;
+    
+    sendMessage({type:"askedForPermission"},tabId);
 }
-async function registerContentScript(url: string) {
-chrome.permissions.request({ "origins": [`*://${url}/*`] }, async (granted) => {
+
+async function registerContentScript(utils: ReturnType<typeof setupStorage>) {
+permissions.request({ "origins": [utils.originMatch] }, async (granted) => {
     if (granted) {
-        if ((await chrome.scripting.getRegisteredContentScripts({"ids":[url]})).length == 0) {
+        if ((await scripting.getRegisteredContentScripts({"ids":[utils.storageKey]})).length == 0) {
             try {
-                // chrome.runtime.lastError
-                await chrome.scripting.registerContentScripts([{
-                    "id":url,
-                    "matches":[`*://${url}/*`],
+                await scripting.registerContentScripts([{
+                    "id":utils.storageKey,
+                    "matches":[utils.originMatch],
                     "js":["content.js"],
                     "css":["content.css"],
                     "persistAcrossSessions":true, // ?
@@ -62,7 +53,7 @@ chrome.permissions.request({ "origins": [`*://${url}/*`] }, async (granted) => {
             } catch (error) {
                 console.log(error);
             }
-        } else console.log("Content already registered")
+        } else console.log("Content already registered");
     }
     else console.log("Not granted - working only one time");
 });}
@@ -70,7 +61,7 @@ chrome.permissions.request({ "origins": [`*://${url}/*`] }, async (granted) => {
 async function notifyIconPressedAndCheckContentScriptPresent(tabId: number): Promise<boolean> {
     try {
         console.log("IconClick sent")
-        let response = await chrome.tabs.sendMessage(tabId, { type: "iconClicked" });
+        let response = await sendMessage({ type: "iconClicked" }, tabId);
         console.log(response.type)
         return response.type == "IconClick Captured - Content Script present";
     } catch (error) {
@@ -81,11 +72,5 @@ async function notifyIconPressedAndCheckContentScriptPresent(tabId: number): Pro
     }
 }
 
-chrome.runtime.onMessage.addListener((message,sender,sendResponse) => {
-    switch (message.type) {
-        // case "registerContentScript":
-        //     registerContentScript(message.url)
-        //     break;
-    }
-});
+// setupMessagesListener().listenToMessage()
 })()
